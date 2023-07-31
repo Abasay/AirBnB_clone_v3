@@ -43,6 +43,8 @@ def post_user():
     newInstance = User(user)
     newInstance.email = user.get("email")
     newInstance.password = user.get("password")
+    newInstance.first_name = user.get("first_name")
+    newInstance.last_name = user.get("last_name")
     storage.new(newInstance)
     storage.save()
     return jsonify(newInstance.to_dict()), 201
