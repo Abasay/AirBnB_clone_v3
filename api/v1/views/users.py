@@ -57,8 +57,8 @@ def put_user(user_id):
     if not obj:
         abort(404)
     requestObj = request.get_json()
-    obj.email = requestObj["email"]
-    obj.password = requestObj["password"]
+    obj.email = requestObj.get("email")
+    obj.password = requestObj.get("password")
     obj.save()
     return jsonify(obj.to_dict()), 200
 
