@@ -69,6 +69,6 @@ def delete_user(user_id):
     obj = storage.get("user", user_id)
     if not obj:
         abort(404)
-    obj.delete()
+    storage.delete(obj)
     storage.save()
     return jsonify({}), 200
