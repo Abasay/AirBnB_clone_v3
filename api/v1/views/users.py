@@ -38,10 +38,10 @@ def post_user():
     if not user['password']:
         return jsonify({"error": "Missing password"}), 400
     newInstance = User(user)
-    newInstance.email = user.get("email")
-    newInstance.password = user.get("password")
-    newInstance.first_name = user.get("first_name")
-    newInstance.last_name = user.get("last_name")
+    newInstance.email = user["email"]
+    newInstance.password = user["password"]
+    newInstance.first_name = user["first_name"]
+    newInstance.last_name = user["last_name"]
     storage.new(newInstance)
     storage.save()
     return jsonify(newInstance.to_dict()), 201
@@ -56,11 +56,11 @@ def put_user(user_id):
     if not obj:
         abort(404)
     requestObj = request.get_json()
-    obj.password = requestObj.get("password")
-    if requestObj.get("first_name"):
-        obj.first_name = requestObj.get("first_name")
-    if requestObj.get("last_name"):
-        obj.last_name = requestObj.get("last_name")
+    obj.password = requestObj["password"]
+    if requestObj["first_name"]:
+        obj.first_name = requestObj["first_name"]
+    if requestObj["last_name"]:
+        obj.last_name = requestObj["last_name"]
     obj.save()
     return jsonify(obj.to_dict()), 200
 
