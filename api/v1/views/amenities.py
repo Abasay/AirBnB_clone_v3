@@ -18,7 +18,8 @@ def handle_amenities():
         return jsonify(amenities)
 
 
-@app_views.route('/amenities/<amenity_id>', strict_slashes=False, methods=['GET'])
+@app_views.route('/amenities/<amenity_id>',
+                 strict_slashes=False, methods=['GET'])
 def fetch_single_amenity(amenity_id):
     """fetch single amenity"""
     amenity = {}
@@ -45,7 +46,8 @@ def post_amenity():
     return jsonify(newInstance.to_dict()), 201
 
 
-@app_views.route('/amenities/<amenity_id>', strict_slashes=False, methods=['PUT'])
+@app_views.route('/amenities/<amenity_id>',
+                 strict_slashes=False, methods=['PUT'])
 def put_amenity(amenity_id):
     """Function that update amenity"""
     if not request.get_json():
