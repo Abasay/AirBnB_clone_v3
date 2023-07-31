@@ -5,7 +5,6 @@ from api.v1.views import app_views
 from flask import jsonify, request, abort, make_response
 from models import storage
 from models.user import User
-import json
 
 
 @app_views.route('/users', strict_slashes=False, methods=['GET'])
@@ -19,10 +18,10 @@ def handle_users():
 
 
 @app_views.route('/users/<user_id>', strict_slashes=False, methods=['GET'])
-def fetch_single_user(user_id):
-    '''fetch single user'''
-    user = storage.get('User', user_id)
-    if not user:
+def fetch_user(user_id):
+    """fetch single user"""
+    user = storage.get("User", user_id)
+    if user is None:
         abort(404)
     return jsonify(user.to_dict())
 
@@ -35,16 +34,12 @@ def post_user():
     user = request.get_json()
     if not user['email']:
         return jsonify({"error": "Missing email"}), 400
-    if not user['password']:
+    elif not user['password']:
         return jsonify({"error": "Missing password"}), 400
-    newInstance = User(user)
-    newInstance.email = user["email"]
-    newInstance.password = user["password"]
-    newInstance.first_name = user["first_name"]
-    newInstance.last_name = user["last_name"]
-    storage.new(newInstance)
-    storage.save()
-    return jsonify(newInstance.to_dict()), 201
+    else:
+        obj = User(**user)
+        obj.save()
+        return jsonify(obj.to_dict()), 201
 
 
 @app_views.route('/users/<user_id>', strict_slashes=False, methods=['PUT'])
@@ -57,10 +52,12 @@ def put_user(user_id):
         abort(404)
     requestObj = request.get_json()
     obj.password = requestObj["password"]
-    if requestObj["first_name"]:
-        obj.first_name = requestObj["first_name"]
-    if requestObj["last_name"]:
-        obj.last_name = requestObj["last_name"]
+    ignore_attributes = ("id", "email", "created_at", "updated_at")
+    for i in requestObj.keys():
+        if i in ignore_attributes:
+            pass
+        else:
+            setattr(obj, i, requestObj[i])
     obj.save()
     return jsonify(obj.to_dict()), 200
 
@@ -72,6 +69,6 @@ def delete_user(user_id):
     obj = storage.get("user", user_id)
     if not obj:
         abort(404)
-    storage.delete(obj)
+    obj.delete()
     storage.save()
     return jsonify({}), 200
