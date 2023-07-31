@@ -21,13 +21,10 @@ def handle_users():
 @app_views.route('/users/<user_id>', strict_slashes=False, methods=['GET'])
 def fetch_single_user(user_id):
     '''fetch single user'''
-    user = {}
-    for us in storage.all('User').values():
-        if us.to_dict().get('id') == user_id:
-            user = us.to_dict()
+    user = storage.get('User', user_id)
     if not user:
         abort(404)
-    return jsonify(user)
+    return jsonify(user.to_dict())
 
 
 @app_views.route('/users', strict_slashes=False, methods=['POST'])
@@ -59,8 +56,11 @@ def put_user(user_id):
     if not obj:
         abort(404)
     requestObj = request.get_json()
-    obj.email = requestObj.get("email")
     obj.password = requestObj.get("password")
+    if requestObj.get("first_name"):
+        obj.first_name = requestObj.get("first_name")
+    if requestObj.get("last_name"):
+        obj.last_name = requestObj.get("last_name")
     obj.save()
     return jsonify(obj.to_dict()), 200
 
