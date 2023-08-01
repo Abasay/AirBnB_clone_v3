@@ -92,4 +92,3 @@ def delete_place(place_id):
     storage.delete(obj)
     storage.save()
     return jsonify({}), 200
-'''
