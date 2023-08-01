@@ -2,11 +2,13 @@
 """The flask app file"""
 from api.v1.views import app_views
 from flask import Flask, jsonify, make_response
+from flask_cors import CORS
 from models import storage
 from os import getenv
 
 
 app = Flask(__name__)
+CORS(app, origins="0.0.0.0")
 app.register_blueprint(app_views)
 app.url_map.strict_slashes = False
 
