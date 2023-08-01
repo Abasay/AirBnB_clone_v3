@@ -93,4 +93,3 @@ def delete_review(review_id):
     storage.delete(obj)
     storage.save()
     return jsonify({}), 200
-'''
