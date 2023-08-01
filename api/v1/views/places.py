@@ -10,17 +10,17 @@ from models.place import Place
 import json
 
 
-@app_views.route('/cities/<city_id>', strict_slashes=False, methods=['GET'])
+@app_views.route('/places/<places_id>', strict_slashes=False, methods=['GET'])
 def handle_place(place_id):
     """return places in json"""
     if request.method == 'GET':
         place = {}
         for pl in storage.all('Place').values():
             if pl.to_dict().get('id') == place_id:
-                city = ci.to_dict()
-        if not city:
+                place = pl.to_dict()
+        if not place:
             abort(404)
-        return jsonify(city)
+        return jsonify(place)
 
 
 @app_views.route('/cities/<city_id>/places',
@@ -42,43 +42,51 @@ def fetch_places(city_id):
 def post_place(city_id):
     """function to post place"""
     city = storage.get("City", city_id)
-    if not state:
+    if not city:
         abort(404)
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
     place = request.get_json()
     if not place['name']:
         return jsonify({"error": "Missing name"}), 400
-    if not place['user_id']:
+    elif not place['user_id']:
         return jsonify({"error": "Mising user_id"}), 400
-    newInstance = Place(place)
-    newInstance.name = place.get("name")
-    newInstance.city_id = city_id
+    elif not storage.get('User', place['user_id']):
+        abort(404)
+    else:
+        newInstance = Place(place)
+        for j in place.keys():
+            setattr(newInstance, j, place[j])
     storage.new(newInstance)
     storage.save()
     return jsonify(newInstance.to_dict()), 201
 
 
-'''
-@app_views.route('/cities/<city_id>', strict_slashes=False, methods=['PUT'])
-def put_city(city_id):
+
+@app_views.route('/places/<place_id>', strict_slashes=False, methods=['PUT'])
+def put_place(place_id):
     """Function that update city"""
     if not request.get_json():
         return jsonify({"error": "Not a JSON"}), 400
-    obj = storage.get("City", city_id)
+    obj = storage.get("Place", place_id)
     if not obj:
         abort(404)
     requestObj = request.get_json()
-    obj.name = requestObj["name"]
+    ignores = ("id", "user_id", "city_id", "created_at", "updated_at")
+    for i in requestObj.keys():
+        if i in ignores:
+            pass
+        else:
+            setattr(obj, i, requestObj[i])
     obj.save()
     return jsonify(obj.to_dict()), 200
 
 
-@app_views.route('/cities/<city_id>',
+@app_views.route('/places/<place_id>',
                  strict_slashes=False, methods=['DELETE'])
-def delete_city(city_id):
-    """Function that delete state"""
-    obj = storage.get("City", city_id)
+def delete_place(place_id):
+    """Function that delete place"""
+    obj = storage.get("Place", place_id)
     if not obj:
         abort(404)
     storage.delete(obj)
